@@ -1,0 +1,140 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: ui-monospace, "Cascadia Code", Menlo, monospace;
+  --font-heading: var(--font-heading);
+  --color-highlight: var(--highlight);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* A paper address book: warm page, dark ink, a green cover as the accent. */
+:root {
+  --background: oklch(0.978 0.007 85);
+  --foreground: oklch(0.25 0.012 60);
+  --card: oklch(0.998 0.002 85);
+  --card-foreground: oklch(0.25 0.012 60);
+  --popover: oklch(0.998 0.002 85);
+  --popover-foreground: oklch(0.25 0.012 60);
+  --primary: oklch(0.42 0.075 162);
+  --primary-foreground: oklch(0.985 0.012 120);
+  --secondary: oklch(0.945 0.01 85);
+  --secondary-foreground: oklch(0.3 0.012 60);
+  --muted: oklch(0.95 0.008 85);
+  --muted-foreground: oklch(0.5 0.014 70);
+  --accent: oklch(0.945 0.012 85);
+  --accent-foreground: oklch(0.3 0.012 60);
+  --destructive: oklch(0.55 0.2 27);
+  --border: oklch(0.9 0.011 85);
+  --input: oklch(0.86 0.014 85);
+  --ring: oklch(0.62 0.08 162);
+  --highlight: oklch(0.92 0.12 98);
+  --radius: 0.75rem;
+  --contact-row-height: 3.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    /* Keep anchors and focused rows clear of the sticky search bar. */
+    scroll-padding-top: 7rem;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    background-color: var(--highlight);
+  }
+}
+
+/* Contact list rows. Every row has the same fixed height: the list reserves
+   room for rows it has not drawn yet by multiplying this height. */
+@layer components {
+  .contact-link {
+    @apply flex items-center gap-3.5 rounded-xl px-3 outline-none transition-colors;
+    height: var(--contact-row-height);
+  }
+  .contact-link:hover,
+  .contact-link:focus-visible {
+    @apply bg-card;
+  }
+  .contact-link:focus-visible {
+    @apply ring-3 ring-ring/50;
+  }
+
+  /* Chevron that appears on hover; drawn in CSS to keep the rows light. */
+  .contact-link::after {
+    content: "";
+    @apply mr-1 size-2 shrink-0 rotate-45 border-t-[1.5px] border-r-[1.5px] border-muted-foreground opacity-0 transition-opacity;
+  }
+  .contact-link:hover::after,
+  .contact-link:focus-visible::after {
+    @apply opacity-100;
+  }
+}
+
+/* Toast action ("Открыть") in the accent color instead of sonner's black. */
+[data-sonner-toast][data-styled="true"] [data-button][data-action] {
+  height: 28px;
+  padding-inline: 10px;
+  border-radius: 8px;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* A contact that was just added gets a marker-pen flash in the list. */
+@keyframes contact-flash {
+  0%,
+  35% {
+    background-color: var(--highlight);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+[data-flash] > .contact-link {
+  animation: contact-flash 2.6s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-flash] > .contact-link {
+    animation-duration: 4s;
+    animation-timing-function: step-end;
+  }
+}
